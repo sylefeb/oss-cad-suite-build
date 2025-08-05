@@ -81,10 +81,10 @@ RUN rustup target add x86_64-pc-windows-gnu && \
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN cd /tmp \
-    && curl -L https://dl.fedoraproject.org/pub/fedora/linux/releases/39/Everything/source/tree/Packages/m/mingw-gmp-6.1.2-16.fc39.src.rpm --output mingw-gmp-6.1.2-16.fc39.src.rpm \
-    && rpm2cpio mingw-gmp-6.1.2-16.fc39.src.rpm | cpio -idmv \
-    && tar -xf gmp-6.1.2.tar.xz \
-    && cd gmp-6.1.2 \
+    && curl -L https://dl.fedoraproject.org/pub/fedora/linux/releases/42/Everything/source/tree/Packages/m/mingw-gmp-6.3.0-2.fc42.src.rpm --output mingw-gmp-6.3.0-2.fc42.src.rpm \
+    && rpm2cpio mingw-gmp-6.3.0-2.fc42.src.rpm | cpio -idmv \
+    && tar -xf gmp-6.3.0.tar.xz \
+    && cd gmp-6.3.0 \
     && mingw64-configure --disable-shared --enable-cxx --enable-static \
     && mingw64-make -j9 \
     && mingw64-make install \
