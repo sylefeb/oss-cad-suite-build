@@ -23,12 +23,12 @@ jobs:
           key: cache-sources-yosys
       - name: Download previous build
         run: |
-          URL="https://github.com/sylefeb/oss-cad-suite-build/releases/download/bucket-windows-x64/windows-x64-yosys.tgz"
-          if wget --spider "${URL}" 2>/dev/null; then
-              wget -qO- "${URL}" --retry-connrefused --read-timeout=20 --timeout=15 --retry-on-http-error=404 | tar xvfz -
-          else
+          # URL="https://github.com/sylefeb/oss-cad-suite-build/releases/download/bucket-windows-x64/windows-x64-yosys.tgz"
+          # if wget --spider "${URL}" 2>/dev/null; then
+          #     wget -qO- "${URL}" --retry-connrefused --read-timeout=20 --timeout=15 --retry-on-http-error=404 | tar xvfz -
+          # else
               echo "Previous version not found in bucket"
-          fi
+          # fi
       - name: Download linux-x64-abc
         run: wget -qO- "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/bucket-linux-x64/linux-x64-abc.tgz" --retry-connrefused --read-timeout=20 --timeout=15 --retry-on-http-error=404 | tar xvfz -
       - name: Build
