@@ -1,4 +1,4 @@
-FROM fedora:42
+FROM fedora:43
 
 RUN dnf install -y  mingw64-gcc \
                     mingw64-gcc-c++ \
