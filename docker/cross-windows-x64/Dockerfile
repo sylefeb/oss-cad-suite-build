@@ -84,6 +84,22 @@ RUN rustup target add x86_64-pc-windows-gnu && \
 # RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN cd /tmp \
+    && curl -L http://archives.fedoraproject.org/pub/archive/fedora/linux/releases/39/Everything/source/tree/Packages/m/mingw-gmp-6.1.2-16.fc39.src.rpm --output mingw-gmp-6.1.2-16.fc39.src.rpm
+RUN cd /tmp \
+    && rpm2cpio mingw-gmp-6.1.2-16.fc39.src.rpm | cpio -idmv \
+    && tar -xf gmp-6.1.2.tar.xz \
+    && cd gmp-6.1.2
+RUN curl -L "https://gitlab.archlinux.org/archlinux/packaging/packages/gmp/-/raw/main/gmp-gcc-15.patch?ref_type=heads&inline=false" --output /tmp/gmp.patch \
+    && cd /tmp/gmp-6.1.2 \
+    && patch -p1 < /tmp/gmp.patch
+RUN cd /tmp/gmp-6.1.2 \
+    && autoconf
+RUN cd /tmp/gmp-6.1.2 \
+    && mingw64-configure --disable-shared --enable-cxx --enable-static ; cat config.log \
+    && mingw64-make -j9 \
+    && mingw64-make install
+
+RUN cd /tmp \
     && curl http://ftp.gnu.org/gnu/bison/bison-3.5.tar.gz --output /tmp/bison-3.5.tar.gz
 RUN cd /tmp \
     && curl -L https://raw.githubusercontent.com/reactos/RosBE/master/Patches/bison-3.5-reactos-fix-win32-build.patch --output /tmp/bison.patch
