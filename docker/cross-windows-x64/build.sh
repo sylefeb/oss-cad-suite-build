@@ -1,1 +1,2 @@
-docker build -t="yosyshq/cross-windows-x64:2.2" -f Dockerfile .
+echo "################## DOCKER ###################"
+docker build -t="bla" -f Dockerfile .

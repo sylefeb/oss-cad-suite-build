@@ -1,4 +1,5 @@
 echo ">>>>>>>>>>> PACKAGING FOR WINDOWS <<<<<<<<<<<<"
+uname -a
 
 cd ${OUTPUT_DIR}${INSTALL_PREFIX}
 mkdir -p lib
