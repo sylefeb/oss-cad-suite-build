@@ -433,10 +433,16 @@ def executeBuild(target, arch, prefix, build_dir, output_dir, nproc, pack_source
 			params += ['-e', '{}={}'.format(i, os.path.join('/work', os.path.relpath(j, os.getcwd())))]
 		else:
 			params += ['-e', '{}={}'.format(i, j)]
-	params += [
-		'yosyshq/cross-'+ arch + ':2.2',
-		'bash', scriptfile.name
-	]
+	if arch == 'windows-x64':
+		params += [
+			'sylefeb/cross-'+ arch + ':2.0',
+			'bash', scriptfile.name
+		]
+	else:
+		params += [
+			'yosyshq/cross-'+ arch + ':2.2',
+			'bash', scriptfile.name
+		]
 	return run_live(params, cwd=build_dir)
 
 def create_tar(tar_name, directory, cwd):

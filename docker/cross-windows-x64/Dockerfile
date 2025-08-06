@@ -1,45 +1,48 @@
 FROM fedora:43
 
-RUN dnf install -y  mingw64-gcc \
-                    mingw64-gcc-c++ \
-                    mingw64-libftdi \
-                    mingw64-boost \
-                    mingw64-pkg-config \
-                    mingw64-tcl \
-                    mingw64-readline \
-                    mingw64-tk \
-                    mingw64-xz \
-                    mingw64-gtk3 \
-                    mingw64-qt5-qtbase \
-                    mingw64-eigen3 \
-                    mingw64-dlfcn \
-                    mingw64-hidapi \
-                    mingw64-bzip2 \
-                    mingw64-curl \
-                    git \
-                    cmake \
-                    autoconf \
-                    autoconf-archive \
-                    automake \
-                    flex \
-                    bison \
-                    patch \
-                    gperf \
-                    binutils \
-                    gcc \
-                    g++ \
-                    bc \
-                    rsync \
-                    python3 \
-                    which \
-                    libtool \
-                    libtool-ltdl-devel \
-                    diffutils \
-                    java-11-openjdk-headless \
-                    cpio \
-                    xz \
-                    help2man \
-                    wget boost-devel
+RUN dnf install -y  mingw64-gcc
+RUN dnf install -y  mingw64-gcc-c++
+RUN dnf install -y  mingw64-libftdi
+RUN dnf install -y  mingw64-boost
+RUN dnf install -y  mingw64-pkg-config
+RUN dnf install -y  mingw64-tcl
+RUN dnf install -y  mingw64-readline
+RUN dnf install -y  mingw64-tk
+RUN dnf install -y  mingw64-xz
+RUN dnf install -y  mingw64-gtk3
+RUN dnf install -y  mingw64-qt5-qtbase
+RUN dnf install -y  mingw64-eigen3
+RUN dnf install -y  mingw64-dlfcn
+RUN dnf install -y  mingw64-hidapi
+RUN dnf install -y  mingw64-bzip2
+RUN dnf install -y  mingw64-curl
+RUN dnf install -y  mingw64-gmp
+RUN dnf install -y  mingw-w64-tools
+RUN dnf install -y  git
+RUN dnf install -y  cmake
+RUN dnf install -y  autoconf
+RUN dnf install -y  autoconf-archive
+RUN dnf install -y  automake
+RUN dnf install -y  flex
+RUN dnf install -y  bison
+RUN dnf install -y  patch
+RUN dnf install -y  gperf
+RUN dnf install -y  binutils
+RUN dnf install -y  gcc
+RUN dnf install -y  g++
+RUN dnf install -y  bc
+RUN dnf install -y  rsync
+RUN dnf install -y  python3
+RUN dnf install -y  which
+RUN dnf install -y  libtool
+RUN dnf install -y  libtool-ltdl-devel
+RUN dnf install -y  diffutils
+# RUN dnf install -y  java-11-openjdk-headless
+RUN dnf install -y  java-21-openjdk-headless
+RUN dnf install -y  cpio
+RUN dnf install -y  xz
+RUN dnf install -y  help2man
+RUN dnf install -y  wget boost-devel
 
 RUN git clone --recursive https://github.com/gsauthof/pe-util && \
     cd pe-util && \
@@ -78,26 +81,26 @@ RUN rustup target add x86_64-pc-windows-gnu && \
     echo "linker = \"x86_64-w64-mingw32-gcc\"" >> /.cargo/config && \
     echo "ar = \"x86_64-w64-mingw32-ar\"" >> /.cargo/config
 
-RUN ln -s /usr/bin/python3 /usr/bin/python
+# RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN cd /tmp \
-    && curl -L https://dl.fedoraproject.org/pub/fedora/linux/releases/42/Everything/source/tree/Packages/m/mingw-gmp-6.3.0-2.fc42.src.rpm --output mingw-gmp-6.3.0-2.fc42.src.rpm \
-    && rpm2cpio mingw-gmp-6.3.0-2.fc42.src.rpm | cpio -idmv \
-    && tar -xf gmp-6.3.0.tar.xz \
-    && cd gmp-6.3.0 \
-    && mingw64-configure --disable-shared --enable-cxx --enable-static \
-    && mingw64-make -j9 \
-    && mingw64-make install \
-    && curl http://ftp.gnu.org/gnu/bison/bison-3.5.tar.gz --output /tmp/bison-3.5.tar.gz \
-    && curl -L https://raw.githubusercontent.com/reactos/RosBE/master/Patches/bison-3.5-reactos-fix-win32-build.patch --output /tmp/bison.patch \
-    && cd /tmp \
-    && tar -xzf bison-3.5.tar.gz \
+    && curl http://ftp.gnu.org/gnu/bison/bison-3.5.tar.gz --output /tmp/bison-3.5.tar.gz
+RUN cd /tmp \
+    && curl -L https://raw.githubusercontent.com/reactos/RosBE/master/Patches/bison-3.5-reactos-fix-win32-build.patch --output /tmp/bison.patch
+RUN cd /tmp \
+    && tar -xzf bison-3.5.tar.gz
+RUN cd /tmp \
     && cd bison-3.5 \
     && patch -p1 < /tmp/bison.patch \
     && mingw64-configure \
-    && mingw64-make -j9 \
-    && mingw64-make install \
-    && rm -rf /tmp/* \
-    && true
+    && mingw64-make CFLAGS+="-Wno-incompatible-pointer-types" -j9 \
+    && mingw64-make install
+RUN cd \
+    && rm -rf /tmp/*
 
 WORKDIR /work
+
+RUN RUSTUP_HOME=/opt/rust/rustup CARGO_HOME=/opt/rust/cargo rustup toolchain install nightly
+RUN RUSTUP_HOME=/opt/rust/rustup CARGO_HOME=/opt/rust/cargo rustup override set nightly
+RUN RUSTUP_HOME=/opt/rust/rustup CARGO_HOME=/opt/rust/cargo rustup target add x86_64-pc-windows-gnu
+RUN dnf install -y  openssl
