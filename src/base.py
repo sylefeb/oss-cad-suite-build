@@ -19,18 +19,18 @@ sources = dict()
 targets = dict()
 architectures = [ 'linux-x64', 'darwin-x64', 'windows-x64', 'linux-arm64', 'darwin-arm64']
 arch_chain = dict({
-	'linux-x64' : None, 
-	'darwin-x64' : 'linux-x64', 
-	'windows-x64' : 'linux-x64', 
-	'linux-arm64' : 'windows-x64', 
+	'linux-x64' : None,
+	'darwin-x64' : 'linux-x64',
+	'windows-x64' : 'linux-x64',
+	'linux-arm64' : 'windows-x64',
 	'darwin-arm64' : 'darwin-x64',
 })
 
 cargo_target = dict({
-	'linux-x64' : 'x86_64-unknown-linux-gnu', 
-	'linux-arm64' : 'aarch64-unknown-linux-gnu', 
-	'windows-x64' : 'x86_64-pc-windows-gnu', 
-	'darwin-x64' : 'x86_64-apple-darwin', 
+	'linux-x64' : 'x86_64-unknown-linux-gnu',
+	'linux-arm64' : 'aarch64-unknown-linux-gnu',
+	'windows-x64' : 'x86_64-pc-windows-gnu',
+	'darwin-x64' : 'x86_64-apple-darwin',
 	'darwin-arm64' : 'aarch64-apple-darwin',
 })
 
@@ -277,7 +277,7 @@ def pullCode(target, build_arch, arch, no_update, single):
 		if is_cloning or (not no_update):
 			log_step_triple("[{}] Checkout ".format(s.name), s.revision)
 			repo.checkout(s.revision)
-		
+
 		s.hash =  repo.get_revision()
 
 		log_step_triple("[{}] Current revision ".format(s.name), s.hash)
@@ -412,7 +412,7 @@ def executeBuild(target, arch, prefix, build_dir, output_dir, nproc, pack_source
 	scriptfile.flush()
 
 	log_step("Compiling ...")
-	params = ['docker', 
+	params = ['docker',
 		'run', '--rm',
 		'--user', '{}:{}'.format(os.getuid(), os.getgid()),
 		'-v', '/tmp:/tmp',
@@ -447,7 +447,7 @@ def create_tar(tar_name, directory, cwd):
 		log_error("Script returned error code {}.".format(code))
 
 def create_exe(exe_name, directory, cwd):
-	params= [ 
+	params= [
 		'docker',
 		'run', '--rm',
 		'--user', '{}:{}'.format(os.getuid(), os.getgid()),
@@ -464,6 +464,9 @@ def create_exe(exe_name, directory, cwd):
 		log_error("Script returned error code {}.".format(code))
 
 def buildCode(build_target, build_arch, nproc, force, dry, pack_sources, single, tar):
+  uname = platform.uname()
+  uname_str = f"{uname.system} {uname.node} {uname.release} {uname.version} {uname.machine} {uname.processor}"
+	log_info("################# Running on : ", uname_str)
 	log_info_triple("Building ", build_target, " for {} architecture ...".format(build_arch))
 
 	version_string = datetime.now().strftime("%Y%m%d")
@@ -483,7 +486,7 @@ def buildCode(build_target, build_arch, nproc, force, dry, pack_sources, single,
 					for r in dep.resources:
 						res.add(r)
 			deps += list(res)
-		
+
 		target_build_order = []
 		target_build_order.append(tuple((build_arch,build_target)))
 		total_pos = len(target_build_order) + len(deps)
@@ -508,7 +511,7 @@ def buildCode(build_target, build_arch, nproc, force, dry, pack_sources, single,
 				if (os.path.exists(hash_file)):
 					dep.hash = open(hash_file, 'r').read()
 				else:
-					log_error("Missing hash file for {} does not exist.".format(dep.name + build_info))		
+					log_error("Missing hash file for {} does not exist.".format(dep.name + build_info))
 	else:
 		target_build_order = build_order
 		total_pos = len(target_build_order)
@@ -529,7 +532,7 @@ def buildCode(build_target, build_arch, nproc, force, dry, pack_sources, single,
 			forceBuild = forceBuild or targets[dep].built
 		hash_file = os.path.join(output_dir, '.hash')
 		if (not forceBuild and os.path.exists(hash_file)):
-			if target.hash == open(hash_file, 'r').read():				
+			if target.hash == open(hash_file, 'r').read():
 				log_info_triple("Step [{:2d}/{:2d}] skipping ".format(pos, total_pos), target.name + build_info)
 				continue
 
@@ -626,7 +629,7 @@ def buildCode(build_target, build_arch, nproc, force, dry, pack_sources, single,
 									package_meta[dep.package]['files'].append(name)
 									if name.startswith("bin/") and arch != 'windows-x64':
 										package_meta[dep.package]['files'].append("libexec" + name[3:])
-			
+
 			metadata = dict({'version' : version_meta, 'packages' : package_meta, 'tools' : tools_meta })
 			with open(os.path.join(output_dir, "yosyshq", "share", "manifest.json"), "w") as manifest_file:
 				json.dump(metadata, manifest_file)
@@ -724,7 +727,7 @@ def generateYaml(target, build_arch, write_to_file):
 	if build_arch==getArchitecture():
 		yaml_content += "  schedule:\n" \
     					"    - cron: '30 0 * * *'\n\n"
-	else:	
+	else:
 		yaml_content += "  workflow_run:\n" \
 						"    workflows: [ {} ]\n" \
 						"    types:\n" \
@@ -735,7 +738,7 @@ def generateYaml(target, build_arch, write_to_file):
 	for t in build_order:
 		arch = t[0]
 		target = targets[t[1]]
-		
+
 		if arch != build_arch:
 			continue
 
@@ -823,14 +826,14 @@ def generateYaml(target, build_arch, write_to_file):
 			yaml_content +="        if: hashFiles('{}-{}.tgz') != ''\n".format(arch, target.name)
 			yaml_content +="        with:\n"
 			yaml_content +="          allowUpdates: True\n"
-			yaml_content +="          prerelease: True\n"			
+			yaml_content +="          prerelease: True\n"
 			yaml_content +="          omitBody: True\n"
 			yaml_content +="          omitBodyDuringUpdate: True\n"
 			yaml_content +="          omitNameDuringUpdate: True\n"
 			yaml_content +="          tag: bucket-{}\n".format(arch)
 			yaml_content +="          artifacts: \"{}-{}.tgz\"\n".format(arch, target.name)
 			yaml_content +="          token: ${{ secrets.GITHUB_TOKEN }}\n"
-	
+
 	if write_to_file:
 		yaml_file = os.path.join(".github", "workflows", "{}.yml".format(arch))
 		with open(yaml_file, 'w') as f:
