@@ -141,8 +141,8 @@ def loadRules(group):
 	global current_rule_group
 	current_rule_group = group
 	rules_dir = os.path.abspath(os.path.join(group, RULES_ROOT))
-  uname = platform.uname()
-  uname_str = f"{uname.system} {uname.node} {uname.release} {uname.version} {uname.machine} {uname.processor}"
+	uname = platform.uname()
+	uname_str = f"{uname.system} {uname.node} {uname.release} {uname.version} {uname.machine} {uname.processor}"
 	log_info_triple("Running on : ", uname_str, " ")
 	log_info_triple("Loading ", group, " building rules ...")
 	if not os.path.exists(rules_dir):
