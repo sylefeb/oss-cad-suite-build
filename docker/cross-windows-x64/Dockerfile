@@ -17,6 +17,7 @@ RUN dnf install -y  mingw64-hidapi
 RUN dnf install -y  mingw64-bzip2
 RUN dnf install -y  mingw64-curl
 RUN dnf install -y  mingw64-gmp
+RUN dnf install -y  mingw64-crt
 RUN dnf install -y  mingw-w64-tools
 RUN dnf install -y  git
 RUN dnf install -y  cmake
@@ -43,6 +44,8 @@ RUN dnf install -y  cpio
 RUN dnf install -y  xz
 RUN dnf install -y  help2man
 RUN dnf install -y  wget boost-devel
+RUN rpm -qi mingw64-crt
+RUN dnf upgrade 'mingw*'
 
 RUN git clone --recursive https://github.com/gsauthof/pe-util && \
     cd pe-util && \
